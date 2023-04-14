@@ -5,8 +5,11 @@ import com.github.ipddev.messaging.command.impl.ReplyCommand;
 import com.github.ipddev.messaging.conversation.Conversation;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.inject.Inject;
+import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.velocitypowered.api.command.BrigadierCommand;
 import com.velocitypowered.api.command.CommandManager;
+import com.velocitypowered.api.command.CommandMeta;
+import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
@@ -44,9 +47,12 @@ public class Messaging {
 
 		final MessageCommand messageCommand = new MessageCommand(this);
 		final ReplyCommand replyCommand = new ReplyCommand(this);
+		final LiteralCommandNode<CommandSource> messageNode = messageCommand.createNode();
+		final LiteralCommandNode<CommandSource> replyNode = replyCommand.createNode();
 
-		commandManager.register(new BrigadierCommand(messageCommand.createNode()));
-		commandManager.register(new BrigadierCommand(replyCommand.createNode()));
+		commandManager.register("msg", new BrigadierCommand(messageNode), "w", "whisper");
+		commandManager.register("reply", new BrigadierCommand(replyNode), "r");
+
 	}
 
 	public void endConversation(Conversation conversation) {
